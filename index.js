@@ -10,6 +10,10 @@ const firebase_version = require('firebase').SDK_VERSION;
 module.exports = {
   name: 'emberfire',
 
+  isDevelopingAddon: function() {
+      return true;
+  },
+
   options: {
     autoImport:{
       exclude: [],

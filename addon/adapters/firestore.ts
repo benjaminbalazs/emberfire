@@ -3,7 +3,6 @@ import { getOwner } from '@ember/application';
 import { pluralize } from 'ember-inflector';
 import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
-import { camelize } from '@ember/string';
 import RSVP, { resolve } from 'rsvp';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
@@ -12,7 +11,7 @@ import { firestore } from 'firebase/app';
 
 /**
  * Persist your Ember Data models in Cloud Firestore
- * 
+ *
  * ```js
  * // app/adapters/application.js
  * import FirestoreAdapter from 'emberfire/adapters/firestore';
@@ -21,7 +20,7 @@ import { firestore } from 'firebase/app';
  *   // configuration goes here
  * });
  * ```
- * 
+ *
  */
 export default class FirestoreAdapter extends DS.Adapter.extend({
 
@@ -37,7 +36,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
 
     /**
      * Enable offline persistence with Cloud Firestore, it is not enabled by default
-     * 
+     *
      * ```js
      * // app/adapters/application.js
      * import FirestoreAdapter from 'emberfire/adapters/firestore';
@@ -46,14 +45,14 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
      *   enablePersistence: true
      * });
      * ```
-     * 
+     *
      */
     // @ts-ignore repeat here for the tyepdocs
     enablePersistence: boolean;
 
     /**
      * Namespace all of the default collections
-     * 
+     *
      * ```js
      * // app/adapters/application.js
      * import FirestoreAdapter from 'emberfire/adapters/firestore';
@@ -62,14 +61,14 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
      *   namespace: 'environments/production'
      * });
      * ```
-     * 
+     *
      */
     // @ts-ignore repeat here for the tyepdocs
     namespace: string|undefined;
 
     /**
      * Override the default configuration of the Cloud Firestore adapter: `{ timestampsInSnapshots: true }`
-     * 
+     *
      * ```js
      * // app/adapters/application.js
      * import FirestoreAdapter from 'emberfire/adapters/firestore';
@@ -78,14 +77,14 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
      *   settings: { timestampsInSnapshots: true }
      * });
      * ```
-     * 
+     *
      */
     // @ts-ignore repeat here for the tyepdocs
     settings: firestore.Settings;
 
     /**
      * Pass persistence settings to Cloud Firestore, enablePersistence has to be true for these to be used
-     * 
+     *
      * ```js
      * // app/adapters/application.js
      * import FirestoreAdapter from 'emberfire/adapters/firestore';
@@ -95,14 +94,14 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
      *   persistenceSettings: { synchronizeTabs: true }
      * });
      * ```
-     * 
+     *
      */
     // @ts-ignore repeat here for the tyepdocs
     persistenceSettings: firestore.PersistenceSettings;
-    
+
     /**
      * Override the default FirebaseApp Service used by the FirestoreAdapter: `service('firebase-app')`
-     * 
+     *
      * ```js
      * // app/adapters/application.js
      * import FirestoreAdapter from 'emberfire/adapters/firestore';
@@ -112,7 +111,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
      *   firebaseApp: service('firebase-different-app')
      * });
      * ```
-     * 
+     *
      */
     // @ts-ignore repeat here for the tyepdocs
     firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
@@ -126,7 +125,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     findAll<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K]) {
         return this.query(store, type);
     }
-    
+
     findHasMany<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
         const adapter = store.adapterFor(relationship.type as never) as any; // TODO fix types
         if (adapter !== this) {
@@ -240,7 +239,7 @@ const isQuerySnapshot = (arg: any): arg is firestore.QuerySnapshot => arg.docs !
 const noop = (ref: CollectionReferenceOrQuery) => ref;
 const getDoc = (adapter: FirestoreAdapter, type: DS.Model, id: string) => docReference(adapter, type, id).then(doc => doc.get());
 // TODO allow override
-const collectionNameForType = (type: any) => pluralize(camelize(typeof(type) === 'string' ? type : type.modelName));
+const collectionNameForType = (type: any) => pluralize(typeof(type) === 'string' ? type : type.modelName);
 const docReference = (adapter: FirestoreAdapter, type: any, id: string) => rootCollection(adapter, type).then(collection => collection.doc(id));
 const getDocs = (query: CollectionReferenceOrQuery) => query.get();
 export const rootCollection = (adapter: FirestoreAdapter, type: any) =>  getFirestore(adapter).then(firestore => {

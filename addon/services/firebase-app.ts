@@ -41,6 +41,8 @@ export default class FirebaseAppService extends Service.extend({
         super.init(...args);
         const app = getApp(this);
         set(this, 'options', app.options);
+        // @ts-ignore
+        set(this, 'app', app);
     }
 
 }

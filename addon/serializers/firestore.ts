@@ -1,16 +1,55 @@
 import DS from 'ember-data';
 import { firestore } from 'firebase/app';
 // @ts-ignore
-import { singularize } from 'ember-inflector';
-
+import { pluralize, singularize } from 'ember-inflector';
+import { inject as service } from '@ember/service';
 export type DocumentSnapshot = firestore.DocumentSnapshot | firestore.QueryDocumentSnapshot;
 export type Snapshot = firestore.DocumentSnapshot | firestore.QuerySnapshot;
+import Ember from 'ember';
+import FirebaseAppService from '../services/firebase-app';
 
 // TODO aside from .data(), key vs. id, metadata, and subcollection this is basicly realtime-database, should refactor to reuse
-export default class FirestoreSerializer extends DS.JSONSerializer {
+export default class FirestoreSerializer extends DS.JSONSerializer.extend({
 
-  // @ts-ignore TODO update the types to support
-  applyTransforms: (a: DS.Model, b: any) => void;
+    firebaseApp: service('firebase-app'),
+
+}) {
+    // @ts-ignore repeat here for the tyepdocs
+    firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
+
+    // @ts-ignore TODO update the types to support
+    applyTransforms: (a: DS.Model, b: any) => void;
+
+    keyForAttribute(key: any) {
+        return key;
+    }
+
+    keyForRelationship(key: any) {
+        return key;
+    }
+
+    shouldSerializeHasMany() {
+        return true;
+    }
+
+    serializeBelongsTo(snapshot: any, json: any, relationship: any) {
+
+        var key = relationship.key;
+        var belongsTo = snapshot.belongsTo(key);
+        let belongsToIsNotNew = belongsTo && belongsTo.record && !belongsTo.record.get('isNew');
+
+        if (belongsToIsNotNew) {
+
+            let payloadType = pluralize(belongsTo.modelName);
+
+            // @ts-ignore
+            const reference = this.get('firebaseApp.app').firestore().collection(payloadType).doc(belongsTo.id);
+
+            json[key] = reference;
+
+        }
+
+    }
 
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.DocumentSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
@@ -95,7 +134,7 @@ const normalizeRealtionship = (relationship: any) => {
 
 const normalizeBelongsTo = (_store: DS.Store, id: any, relationship: any, _included: any[]) => {
   if (id) {
-    return { data: { id, type: relationship.type }};
+    return { data: { id: id.id, type: relationship.type }};
   } else {
     return { };
   }
