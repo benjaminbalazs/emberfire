@@ -1,5 +1,6 @@
 // @ts-ignore export for Node problem
 import _firebase from 'firebase/app';
+import "firebase/performance";
 import FirebaseAppService from '../services/firebase-app';
 import RealtimeListenerService from '../services/realtime-listener';
 import FirestoreAdapter from '../adapters/firestore';
@@ -31,6 +32,7 @@ const loadEnvironment = (application, environment) => {
     const options = Object.assign({}, config.options);
     options.name = options.name || environment.name;
     firebase.initializeApp(config, options);
+    firebase.performance();
     const serviceName = options.name === '[DEFAULT]' && `firebase-app` || `firebase-${options.name}`;
     application.register(`service:${serviceName}`, FirebaseAppService.extend({ name: options.name }), { instantiate: true });
 };
