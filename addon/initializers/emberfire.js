@@ -22,8 +22,8 @@ const initialize = (application) => {
     application.register("service:realtime-listener", RealtimeListenerService.extend({}), { instantiate: true });
     application.register('adapter:-firestore', FirestoreAdapter);
     application.register('serializer:-firestore', FirestoreSerializer);
-    application.register('adapter:-realtime-database', RealtimeDatabaseAdapater);
-    application.register('serializer:-realtime-database', RealtimeDatabaseSerializer);
+    //application.register('adapter:-realtime-database', RealtimeDatabaseAdapater);
+    //application.register('serializer:-realtime-database', RealtimeDatabaseSerializer);
 };
 const loadEnvironment = (application, environment) => {
     const config = Object.assign({}, environment);
