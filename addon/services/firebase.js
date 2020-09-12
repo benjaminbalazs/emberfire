@@ -8,6 +8,8 @@ export default class FirebaseService extends Service {
         super(...arguments);
         this.app = (name) => firebase.app(name);
         this.apps = firebase.apps;
+        this.GoogleAuthProvider = auth.GoogleAuthProvider;
+        this.FacebookAuthProvider = auth.FacebookAuthProvider;
         this.OAuthProvider = auth.OAuthProvider;
         this.initializeApp = (options, nameOrConfig) => firebase.initializeApp(options, nameOrConfig);
     }
